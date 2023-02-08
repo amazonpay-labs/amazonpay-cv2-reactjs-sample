@@ -55,15 +55,15 @@ REACT_APP_PUBLIC_KEY_ID="SANDBOX-AGH2Y6VC2VAUJ27GG6VDFOTD"
 ```
 
 ### ③client
-③-1: cd client にて clientディレクトリに移動して以下を実行してください。
-③-2: npm install
-③-3: npm run build
+③-1: cd client にて clientディレクトリに移動して以下を実行してください。  
+③-2: npm install  
+③-3: npm run build  
 
 
 ### ④server
-④-1: cloneなどしたフォルダ直下に戻り以下を実行してください。
-④-2: npm install
-④-3: npm start
+④-1: cloneなどしたフォルダ直下に戻り以下を実行してください。  
+④-2: npm install  
+④-3: npm start  
 
 ### ⑤テストアカウントの用意
 動作を確認するためにSANDBOX環境のテスト用購入者アカウントを用意します。
@@ -71,7 +71,7 @@ REACT_APP_PUBLIC_KEY_ID="SANDBOX-AGH2Y6VC2VAUJ27GG6VDFOTD"
 テスト用IDとPWもご利用可能です: （IDとPWは同じ） jp-amazonpay-tester@amazon.co.jp
 
 ## 疎通確認
-①～⑤の設定が完了しましたら、http://localhost:8080/　(デフォルト)をブラウザなどで開いてください。Amazon Pay の購入フローが完了できましたら、設定は完了となります。
+①～⑤の設定が完了しましたら、[http://localhost:8080/](http://localhost:8080/) (デフォルト)をブラウザなどで開いてください。Amazon Pay の購入フローが完了できましたら、設定は完了となります。
 
 ## Signature 設定
 当サンプルでは設定を簡易化するため都度ボタンレンダー用のSignatureを生成しておりますがpayloadが固定であれば、一度生成したものを利用し続けられますので、実運用では負荷軽減のため固定値を用いることを推奨いたします。[FAQ](http://amazonpay-integration.amazon.co.jp/amazonpay-faq-v2/detail.html?id=QA-63) もご参照ください。
