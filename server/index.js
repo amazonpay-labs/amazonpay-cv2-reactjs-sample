@@ -6,59 +6,47 @@ dotenv.config();
 const PORT = process.env.PORT;
 
 const app = express();
-const fs = require('fs');
-const Client = require('@amazonpay/amazon-pay-api-sdk-nodejs');
-const uuidv4 = require('uuid/v4');
-const updateCheckoutSession = require('./updateCheckout');
-const completeCheckoutSession = require('./completeCheckout');
+const AmazonPayClient = require('./amazonPayClient');
+
 const chargePermission = require('./chargePermission');
 const charge = require('./charge');
-const config = {
-  publicKeyId: process.env.PUBLIC_KEY_ID,
-  privateKey: fs.readFileSync(process.env.PRIVATE_KEY),
-  region: process.env.REGION,
-  sandbox: true,
-};
-
-const testPayClient = new Client.AmazonPayClient(config);
-const payload = {
-  webCheckoutDetails: {
-    checkoutReviewReturnUrl: 'http://localhost:' + process.env.PORT + '/review',
-  },
-  storeId: process.env.CLIENT_ID,
-};
-const signature = testPayClient.generateButtonSignature(payload);
+const amazonPay = new AmazonPayClient();
+const checkoutSessionManager = require('./checkoutSessionManager');
 
 app.use(express.static(path.resolve(__dirname, '../client/build')));
 
-app.get('/buttonSignature', (req, res) => {
-  console.log('buttonSignature called');
-  res.json({
-    payloadJSON: payload,
-    signature: signature,
-  });
+app.get("/buttonSignature", (req, res) => {
+    const payload = {
+        webCheckoutDetails: {
+            checkoutReviewReturnUrl: 'http://localhost:'+process.env.PORT+'/review'
+        },
+        storeId: process.env.CLIENT_ID
+    
+    };
+    const signature = amazonPay.amazonpayClient.generateButtonSignature(payload);
+    console.log("buttonSignature created");
+    res.json({
+        payloadJSON: payload,
+        signature: signature
+    });
 });
 
-const WebStoreClient = new Client.WebStoreClient(config);
 
-app.get('/getCheckoutSession', (req, res) => {
-  console.log('checkoutSession called');
-  const headers = {
-    'x-amz-pay-idempotency-key': uuidv4().toString().replace(/-/g, ''),
-  };
-  console.log('TestClient', WebStoreClient);
-  console.log('query', req.query);
-  WebStoreClient.getCheckoutSession(req.query.CheckoutSessionId, headers).then(
-    (response) => {
-      res.json(response.data);
-    }
-  );
+app.get("/getCheckoutSession", (req, res) => {
+    console.log("checkoutSession called");
+    console.log("query", req.query);
+    checkoutSessionManager.getCheckoutSession(req.query.CheckoutSessionId, amazonPay.webstoreClient)
+    .then((response) => {
+        res.json(
+            response.data
+       )
+    });
+    
 });
 
-app.get('/updateCheckoutSession', (req, res) => {
-  console.log('Calling updateCheckoutSession', req.query);
-  updateCheckoutSession
-    .updateCheckoutSession(req.query.checkoutSessionId)
+app.get("/updateCheckoutSession", (req, res) => {
+    console.log("Calling updateCheckoutSession", req.query);
+    checkoutSessionManager.updateCheckoutSession(req.query.checkoutSessionId, amazonPay.webstoreClient)
     .then((response) => {
       res.json(response.data);
     })
@@ -67,9 +55,8 @@ app.get('/updateCheckoutSession', (req, res) => {
     });
 });
 
-app.get('/completeCheckoutSession', (req, res) => {
-  completeCheckoutSession
-    .completeCheckoutSession(req.query.CheckoutSessionId)
+app.get("/completeCheckoutSession", (req, res) => {
+    checkoutSessionManager.completeCheckoutSession(req.query.CheckoutSessionId, amazonPay.webstoreClient)
     .then((response) => {
       res.send(response.data);
     })
@@ -84,8 +71,7 @@ app.get('/completeCheckoutSession', (req, res) => {
 });
 
 app.get('/getChargePermission', (req, res) => {
-  chargePermission
-    .getChargePermission(req.query.chargePermissionId)
+    chargePermission.getChargePermission(req.query.chargePermissionId, amazonPay.webstoreClient)
     .then((response) => {
       res.send(response.data);
     })
@@ -100,8 +86,7 @@ app.get('/getChargePermission', (req, res) => {
 });
 
 app.get('/getCharge', (req, res) => {
-  charge
-    .getCharge(req.query.charge)
+    charge.getCharge(req.query.charge, amazonPay.webstoreClient)
     .then((response) => {
       res.send(response.data);
     })
