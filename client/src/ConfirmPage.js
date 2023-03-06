@@ -12,9 +12,6 @@ function ConfirmPage(props) {
   const [apiResponse, setApiResponse] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [text, setText] = useState("");
-  const search = window.location?.search;
-  const params = new URLSearchParams(search);
-  const checkoutSessionId = params.get('amazonCheckoutSessionId');
   const statusMessageMap = {
     "Completed": "Your Order has been placed",
     "BuyerCanceled": "The Order has been canceled by the user",
@@ -25,9 +22,7 @@ function ConfirmPage(props) {
   }
 
   const callGetCheckout = (charge) => {
-        fetch("/getCharge?" + new URLSearchParams({
-          charge: charge
-        }).toString())
+        fetch("/getCharge?")
         .then(res => res.json())
         .then((res) => {
           console.log("30 seconds")
@@ -53,15 +48,11 @@ function ConfirmPage(props) {
         
   }
   useEffect(() => {
-    fetch("/completeCheckoutSession?" + new URLSearchParams({
-      CheckoutSessionId: checkoutSessionId
-    }).toString())
+    fetch("/completeCheckoutSession?")
       .then((res) => res.json())
       .then((res) => {
 
-        fetch("/getCheckoutSession?" + new URLSearchParams({
-          CheckoutSessionId: checkoutSessionId
-        }).toString())
+        fetch("/getCheckoutSession?")
         .then(res => res.json())
         .then((res) => {
           if(res.statusDetails.state === "Completed") {

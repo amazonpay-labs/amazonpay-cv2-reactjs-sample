@@ -19,7 +19,7 @@ module.exports = {
                 canHandlePendingAuthorization: true,
                 chargeAmount: {
                     amount: 30,             //Amount to be charged
-                    currencyCode: 'USD'
+                    currencyCode: 'JPY'
                 }
             },
             merchantMetadata: {
@@ -39,7 +39,7 @@ module.exports = {
         const payload = {
             chargeAmount: {
                 amount: 30.00,
-                currencyCode: "USD"
+                currencyCode: "JPY"
             }
         }
         ;
