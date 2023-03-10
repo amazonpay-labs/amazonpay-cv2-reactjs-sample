@@ -20,32 +20,36 @@ function ReviewPage(props) {
     'https://static-fe.payments-amazon.com/checkout.js'
   );
   useEffect(() => {
-    console.log(
-      '/getCheckoutSession' +
-        new URLSearchParams({ CheckoutSessionId: checkoutSessionId }).toString()
-    );
-    fetch(
-      '/getCheckoutSession?' +
-        new URLSearchParams({
-          CheckoutSessionId: checkoutSessionId,
-        }).toString()
-    )
-      .then((res) => res.json())
-      .then((res) => {
-        console.log('result', res.shippingAddress);
-        // setAddress(res.shippingAddress);
-        // setPaymentMethod(res.paymentDetails);
-        if (scriptState === 'ready') {
-          changeAddressButton(checkoutSessionId);
-          changePaymentButton(checkoutSessionId);
-          console.log(res);
-          setApiResponse(JSON.stringify(res, null, 3));
-          setIsLoading(false);
-          setAddress(res.shippingAddress);
-          setPaymentMethod(res.paymentPreferences[0].paymentDescriptor);
-          console.log('getCheckoutSession complete');
-        }
-      });
+    fetch('/setCheckoutSessionId', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        checkoutSessionId: checkoutSessionId
+      })
+    })
+    .then((res) => {
+      fetch(
+        '/getCheckoutSession' 
+      )
+        .then((res) => res.json())
+        .then((res) => {
+          console.log('result', res.shippingAddress);
+          // setAddress(res.shippingAddress);
+          // setPaymentMethod(res.paymentDetails);
+          if (scriptState === 'ready') {
+            changeAddressButton(checkoutSessionId);
+            changePaymentButton(checkoutSessionId);
+            console.log(res);
+            setApiResponse(JSON.stringify(res, null, 3));
+            setIsLoading(false);
+            setAddress(res.shippingAddress);
+            setPaymentMethod(res.paymentPreferences[0].paymentDescriptor);
+            console.log('getCheckoutSession complete');
+          }
+        });
+    })
   }, [scriptState]);
 
   const updateCheckout = () => {
